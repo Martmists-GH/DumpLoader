@@ -10,7 +10,7 @@
 
 using namespace std;
 
-string baseurl = "http://luma.martmists.com";
+string baseurl = "http://luma.martmists.com/";
 
 string getLatestCoreDump() {
     string last = "";
@@ -45,7 +45,7 @@ string postFile(const string filename) {
         char buf[size];
         file.read(buf, size);
 
-        string url = baseurl + "/upload";
+        string url = baseurl + "upload";
 
         httpcContext ctx;
         httpcOpenContext(&ctx, HTTPC_METHOD_POST, url.c_str(), 0);
