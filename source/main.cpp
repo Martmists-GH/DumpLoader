@@ -23,9 +23,6 @@ string getLatestCoreDump() {
             last = ent->d_name;
         }
         closedir(dir);
-    } else {
-        /* could not open directory */
-        perror("");
     }
     return last;
 }
@@ -108,7 +105,7 @@ int main(int argc, const char *argv[]) {
 
     bool done = false;
 
-    cout << "Press A to upload your latest error dump, START to exit.";
+    cout << "Press A to upload your latest error dump, START to exit.\n";
 
     // Main loop
     while (aptMainLoop()) {
@@ -122,17 +119,17 @@ int main(int argc, const char *argv[]) {
             break; // break in order to return to hbmenu
 
         if (kDown & KEY_A && !done) {
-            cout << "Retrieving latest dump...";
+            cout << "Retrieving latest dump...\n";
             string filename = getLatestCoreDump();
             if (filename.empty()) {
-                cout << "No dumps found!";
+                cout << "No dumps found!\n";
             } else {
-                cout << "Found file: /luma/dumps/arm11/" + filename;
-                cout << "Uploading...";
+                cout << "Found file: /luma/dumps/arm11/" + filename + "\n";
+                cout << "Uploading...\n";
                 string result = postFile(filename);
-                cout << "Here is your link: " + result;
-                cout << "Press START to exit.";
+                cout << "Here is your link: " + result + "\n";
             }
+            cout << "Press START to exit.";
             done = true;
         }
     }
