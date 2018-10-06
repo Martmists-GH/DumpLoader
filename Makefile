@@ -153,6 +153,7 @@ endif
 all:
 	@mkdir -p $(BUILD) $(GFXBUILD)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@makerom -elf dumploader.elf -rsf app.rsf -icon icon.png -f cia -o dumploader.cia
 
 #---------------------------------------------------------------------------------
 clean:
