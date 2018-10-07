@@ -153,7 +153,9 @@ endif
 all:
 	@mkdir -p $(BUILD) $(GFXBUILD)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
-	@makerom -elf dumploader.elf -rsf app.rsf -icon icon.png -f cia -o dumploader.cia
+	@bannertool makebanner -i banner.png -a sound.wav -o banner.bnr
+	@bannertool makesmdh -s "Dumploader" -l "Luma Dump uploader" -p "Martmists" -i icon.png -o icon.icn
+	@makerom -elf dumploader.elf -rsf app.rsf -icon icon.png -icon icon.icn -banner banner.bnr -f cia -o dumploader.cia
 
 #---------------------------------------------------------------------------------
 clean:
