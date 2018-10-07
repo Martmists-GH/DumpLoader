@@ -154,8 +154,8 @@ all:
 	@mkdir -p $(BUILD) $(GFXBUILD)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 	@bannertool makebanner -i banner.png -a sound.wav -o banner.bnr
-	@bannertool makesmdh -s "Dumploader" -l "Luma Dump uploader" -p "Martmists" -i icon.png -o icon.icn
-	@makerom -elf dumploader.elf -rsf app.rsf -icon icon.png -icon icon.icn -banner banner.bnr -f cia -o dumploader.cia
+	@bannertool makesmdh -s "Dumploader" -l "Luma Dump uploader" -p "Martmists" -i icon.png -f visible -o icon.icn
+	@makerom -elf dumploader.elf -rsf app.rsf -icon icon.icn -banner banner.bnr -f cia -o dumploader.cia
 
 #---------------------------------------------------------------------------------
 clean:

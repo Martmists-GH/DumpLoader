@@ -1,6 +1,6 @@
 BasicInfo:
-  Title                   : CtrApp
-  ProductCode             : CTR-P-DMPL
+  Title                   : DumpLoader
+  ProductCode             : CTR-MM-DMPL
   Logo                    : Nintendo # Nintendo / Licensed / Distributed / iQue / iQueForSystem
 
 RomFs:
