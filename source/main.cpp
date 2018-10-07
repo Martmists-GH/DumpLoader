@@ -1,7 +1,7 @@
-#include <string>
+#include <cstring>
 #include <list>
 #include <dirent.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -16,10 +16,10 @@ string getLatestCoreDump() {
     string last = "";
 
     DIR *dir;
-    struct dirent *ent;
+    dirent *ent;
     if ((dir = opendir("/luma/dumps/arm11")) != nullptr) {
-        /* print all the files and directories within directory */
         while ((ent = readdir(dir)) != nullptr) {
+            // Get last file
             last = ent->d_name;
         }
         closedir(dir);
@@ -43,13 +43,38 @@ string postFile(const string filename) {
         file.read(buf, size);
 
         string url = baseurl + "upload";
+        string b = "----------287032381131322";
+        string part = "\nContent-Disposition: form-data; name=\"datafile1\"; filename=\"file.dump\""
+                      "\nContent-Type: application/octet-stream\n\n";
+        string end = b+"--";
+        string h = "multipart/form-data;boundary="+b;
 
         httpcContext ctx;
         httpcOpenContext(&ctx, HTTPC_METHOD_POST, url.c_str(), 0);
-        httpcAddRequestHeaderField(&ctx, "Content-Type", "application/octet-stream");
-        httpcAddPostDataRaw(&ctx, (u32*)buf, size);
+        httpcSetSSLOpt(&ctx, SSLCOPT_DisableVerify);
+        httpcSetKeepAlive(&ctx, HTTPC_KEEPALIVE_ENABLED);
+        httpcAddRequestHeaderField(&ctx, "User-Agent", "DumpLoader/1.0.0");
+        httpcAddRequestHeaderField(&ctx, "Content-Type", h.c_str());
+        httpcAddPostDataAscii(&ctx, ("\n" + b).c_str(), "25");
+        httpcAddPostDataAscii(&ctx, part.c_str(), "118");
+        httpcAddPostDataRaw(&ctx, (u32*)buf, strlen(buf));
+        httpcAddPostDataAscii(&ctx, ("\n" + end).c_str(), "27");
 
         Result ret = httpcBeginRequest(&ctx);
+
+        u32 statuscode = 0;
+
+        if(ret!=0){
+            httpcCloseContext(&ctx);
+            throw;
+        }
+
+        ret = httpcGetResponseStatusCode(&ctx, &statuscode);
+
+        if(ret!=0){
+            httpcCloseContext(&ctx);
+            throw;
+        }
 
         u8 *res = (u8*)malloc(0x1000);
         u32 readsize=0, rsize=0;
@@ -90,8 +115,11 @@ string postFile(const string filename) {
             throw;
         }
 
+        httpcCloseContext(&ctx);
+
         return baseurl + (string)buf;
-    } catch (...) {
+    } catch (exception e) {
+        cout << e.what();
         return "An error occured, please make sure you have a working internet connection.";
     }
 }
@@ -99,6 +127,7 @@ string postFile(const string filename) {
 int main(int argc, const char *argv[]) {
     u32 *socubuf = nullptr;
     R_FAILED(socInit(socubuf, 0x100000));
+    httpcInit(4 * 1024 * 1024);
 
     gfxInitDefault();
     consoleInit(GFX_TOP, nullptr);
@@ -115,8 +144,9 @@ int main(int argc, const char *argv[]) {
 
         // Your code goes here
         int kDown = hidKeysDown();
-        if (kDown & KEY_START)
+        if (kDown & KEY_START) {
             break; // break in order to return to hbmenu
+        }
 
         if (kDown & KEY_A && !done) {
             cout << "Retrieving latest dump...\n";
@@ -127,7 +157,7 @@ int main(int argc, const char *argv[]) {
                 cout << "Found file: /luma/dumps/arm11/" + filename + "\n";
                 cout << "Uploading...\n";
                 string result = postFile(filename);
-                cout << "Here is your link: " + result + "\n";
+                cout << "Here is your link:\n" + result + "\n";
             }
             cout << "Press START to exit.";
             done = true;
